@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Photo Album</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #efe7da 0%, #f8f4ed 45%, #e7dccb 100%);
+      color: #2f2a24;
+      padding: 48px 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 48px;
+      letter-spacing: -0.8px;
+      color: #2c261f;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #6e6256;
+    }
+
+    .section {
+      background: rgba(255, 252, 247, 0.92);
+      border: 1px solid rgba(120, 95, 70, 0.14);
+      padding: 28px;
+      border-radius: 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 14px 35px rgba(75, 58, 38, 0.11);
+      backdrop-filter: blur(8px);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 22px;
+      color: #3b3128;
+      font-weight: 700;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    input[type=text], input[type=file] {
+      flex: 1;
+      min-width: 240px;
+      padding: 12px 14px;
+      border: 1px solid #d4c6b4;
+      border-radius: 12px;
+      background: #fffaf3;
+      color: #2f2a24;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    input[type=text]:focus, input[type=file]:focus {
+      border-color: #9b7653;
+      box-shadow: 0 0 0 4px rgba(155, 118, 83, 0.14);
+      background: #fffdf9;
+    }
+
+    input[type=file] {
+      cursor: pointer;
+    }
+
+    button {
+      padding: 12px 22px;
+      background: #7a5635;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 20px rgba(122, 86, 53, 0.22);
+    }
+
+    button:hover {
+      background: #63462d;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(122, 86, 53, 0.28);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #searchStatus, #uploadStatus {
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .status, .error {
+      display: inline-block;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .status {
+      color: #2f5d45;
+      background: #e4f3ea;
+      border: 1px solid #b7dcc7;
+    }
+
+    .error {
+      color: #8a2e24;
+      background: #f8e4df;
+      border: 1px solid #efb9ae;
+    }
+
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .photo-card {
+      background: #fffaf3;
+      border: 1px solid #e0d1bd;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(75, 58, 38, 0.09);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 32px rgba(75, 58, 38, 0.14);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      background: #eadfce;
+    }
+
+    .photo-info {
+      padding: 13px 14px 15px;
+    }
+
+    .photo-title {
+      margin: 0 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #332b23;
+      word-break: break-all;
+    }
+
+    .photo-labels {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #75685c;
+    }
+
+    .helper-text {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #7c6f63;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 30px 14px;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      .section {
+        padding: 22px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      input[type=text], input[type=file] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="hero">
+      <h1>AI Photo Album</h1>
+      <p class="subtitle">Upload photos, add custom labels, and search your album using natural language.</p>
+    </header>
+
+    <div class="section">
+      <h2>Search photos</h2>
+      <div class="input-row">
+        <input type="text" id="searchQuery" placeholder="Try: show me dogs, find coffee, I want to see cats" />
+        <button onclick="searchPhotos()">Search</button>
+      </div>
+      <div id="searchStatus"></div>
+      <div id="results"></div>
+    </div>
+
+    <div class="section">
+      <h2>Upload photo</h2>
+      <div class="input-row">
+        <input type="file" id="photoFile" accept="image/*" />
+      </div>
+      <div class="input-row" style="margin-top: 14px;">
+        <input type="text" id="customLabels" placeholder="Optional custom labels, e.g. Sam, Sally, vacation" />
+        <button onclick="uploadPhoto()">Upload</button>
+      </div>
+      <p class="helper-text">Custom labels are optional. Rekognition will still detect labels automatically.</p>
+      <div id="uploadStatus"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_ENDPOINT = 'https://aet4dozj99.execute-api.us-east-1.amazonaws.com/prod';
+    const API_KEY = 'vdypMf257e1kOCqnJBhq6PmQW9kkJzjabPNlqDO7';
+
+    async function searchPhotos() {
+      const query = document.getElementById('searchQuery').value.trim();
+      const statusEl = document.getElementById('searchStatus');
+      const resultsEl = document.getElementById('results');
+
+      if (!query) {
+        statusEl.innerHTML = '<span class="error">Please enter a search query.</span>';
+        return;
+      }
+
+      statusEl.innerHTML = '<span class="status">Searching your album...</span>';
+      resultsEl.innerHTML = '';
+
+      try {
+        const response = await fetch(`${API_ENDPOINT}/search?q=${encodeURIComponent(query)}`, {
+          headers: { 'x-api-key': API_KEY }
+        });
+
+        const data = await response.json();
+        const results = data.results || [];
+
+        if (results.length === 0) {
+          statusEl.innerHTML = '<span class="error">No matching photos found.</span>';
+          return;
+        }
+
+        const photoWord = results.length === 1 ? 'photo' : 'photos';
+        statusEl.innerHTML = `<span class="status">Found ${results.length} matching ${photoWord}</span>`;
+
+        results.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'photo-card';
+          card.innerHTML = `
+            <img src="${r.url}" alt="${r.objectKey}" />
+            <div class="photo-info">
+              <p class="photo-title">${r.objectKey}</p>
+              <p class="photo-labels">${(r.labels || []).join(', ')}</p>
+            </div>
+          `;
+          resultsEl.appendChild(card);
+        });
+      } catch (err) {
+        statusEl.innerHTML = `<span class="error">Search failed: ${err.message}</span>`;
+      }
+    }
+
+    async function uploadPhoto() {
+      const fileInput = document.getElementById('photoFile');
+      const customLabelsInput = document.getElementById('customLabels').value.trim();
+      const statusEl = document.getElementById('uploadStatus');
+
+      if (!fileInput.files[0]) {
+        statusEl.innerHTML = '<span class="error">Please select a file first.</span>';
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const fileName = encodeURIComponent(file.name);
+
+      statusEl.innerHTML = '<span class="status">Uploading photo...</span>';
+
+      const headers = {
+        'Content-Type': file.type,
+        'x-api-key': API_KEY
+      };
+
+      if (customLabelsInput) {
+        headers['x-amz-meta-customlabels'] = customLabelsInput;
+      }
+
+      try {
+        const response = await fetch(`${API_ENDPOINT}/photos/${fileName}`, {
+          method: 'PUT',
+          headers: headers,
+          body: file
+        });
+
+        if (response.ok) {
+          statusEl.innerHTML = '<span class="status">Photo uploaded successfully. It will appear in search shortly.</span>';
+          fileInput.value = '';
+          document.getElementById('customLabels').value = '';
+        } else {
+          statusEl.innerHTML = `<span class="error">Upload failed: ${response.status} ${response.statusText}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span class="error">Upload failed: ${err.message}</span>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('searchQuery').addEventListener('keypress', e => {
+        if (e.key === 'Enter') searchPhotos();
+      });
+    });
+  </script>
+</body>
+</html>

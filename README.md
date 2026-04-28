@@ -8,13 +8,14 @@ The application allows users to upload photos, add optional custom labels, and s
 
 ```text
 .
-├── frontend/
+├── front-end/
 │   ├── index.html
-│   └── buildspec.yml
 ├── lambda-functions/
 │   ├── index-photos/
-│   │   └── lambda_function.py
+│   │   └── index-photos_lambda_function.py
 │   └── search-photos/
-│       └── lambda_function.py
-└── cloudformation/
+│       └── search-photos_lambda_function.py
+└── other-srcipts/
+    └── backend-buildspec.yml
     └── cloudformation.yml
+    └── frontend-buildspec.yml

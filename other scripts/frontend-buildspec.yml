@@ -1,6 +1,0 @@
-version: 0.2
-
-phases:
-  build:
-    commands:
-      - aws s3 cp frontend/index.html s3://devansh-frontend-hw3/index.html
